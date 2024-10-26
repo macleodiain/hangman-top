@@ -4,7 +4,7 @@ class SecretWord
     if args.empty?
       @secret_word = get_new_word 
     else
-      @secret_word = args[0].split("")
+      @secret_word = args
     end
     @length = @secret_word.length
   end

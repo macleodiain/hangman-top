@@ -1,7 +1,7 @@
 class Menu
   require_relative "lib/game"
   def initialize
-        
+        main_menu
   end  
 
   def main_menu
@@ -13,7 +13,18 @@ class Menu
     when 1
       Game.new()
     when 2
-      #LOAD GAME
+      puts "Choose save file"
+      files = Dir.entries("saves").reject {|f| File.directory?(f)}
+      files.each do |filename|
+        puts filename
+      end
+    
+      filename = gets.chomp
+      save_file = File.open("saves/#{filename}", "r").read
+      Game.from_json(save_file)
+      
+      
+      # 
     when 3
       exit
     else
@@ -22,3 +33,4 @@ class Menu
     end
   end
 end
+Menu.new

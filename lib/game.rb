@@ -1,5 +1,6 @@
 class Game
   require_relative "secret_word.rb"
+  require "json"
   def initialize(args = [])
     if args.empty?
       #start game as normal
@@ -10,6 +11,10 @@ class Game
       @known_letters = Array.new(@secret_word.length, "_")
     else
       #load game from args
+      @secret_word = SecretWord.new(args[0])
+      @lives = args[1]
+      @known_letters = args[2]
+      @previous_guesses = args[3]
     end
     run_game
   end
@@ -33,8 +38,12 @@ class Game
   def get_guess
     puts "Please enter you guess:"
     guess = gets.chomp.downcase
-    if guess == "SAVE" 
-      #run save method
+    if guess == "save" 
+      to_json
+    end
+    if guess == "quit"
+      puts "Quitting game"
+      exit
     end
     #check single character and in range a..z
     if guess.length == 1 && guess in "a".."z"
@@ -78,8 +87,32 @@ class Game
       exit
     end
   end
+
+  def to_json
+    puts "Enter save name:"
+    filename = gets.chomp
+    output = JSON.dump(
+      {:secret_word => @secret_word.secret_word, 
+      :lives => @lives,
+      :known_letters => @known_letters,
+      :previous_guesses => @previous_guesses
+  })
+      Dir.mkdir("saves") unless Dir.exist?("saves")
+      File.open("saves/#{filename}", "w") do |f|
+        f.puts output
+      end
+      puts "Saved to saves/#{filename}.txt"
+      print "Exiting game"
+      3.times do
+        print "."
+        sleep (1)
+      end
+      print "\n"
+      exit
+  end
+
+  def self.from_json(string)
+    data = JSON.load(string)
+    self.new([data["secret_word"], data["lives"], data["known_letters"], data["previous_guesses"]])
+  end
 end#class end
-
-a = Game.new()
-
-
